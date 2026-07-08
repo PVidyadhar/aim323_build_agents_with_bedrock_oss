@@ -23,6 +23,51 @@ Labs Include
 **Lab 6: Evaluate Agents using ragas**
 - Evaluate the effectiveness and accuracy of our multi-agent travel booking system using the [ragas library](https://docs.ragas.io/en/stable/). This lab will guide you through the process of evaluating agents' performance on various tasks, such as retrieving relevant information, generating accurate responses, and effectively handling user requests.
 
+## Managed Knowledge Bases (New)
+
+The knowledge base used in Lab 3 (travel agent with tools) can now leverage **Managed Knowledge Bases**, which let Bedrock handle embedding, storage, and retrieval automatically — no external vector store required.
+
+To use a managed knowledge base with the workshop:
+1. Create a Managed Knowledge Base in the [Amazon Bedrock console](https://console.aws.amazon.com/bedrock/)
+2. Upload the workshop data files to the managed KB data source
+3. Update the `knowledge_base_id` in the notebook to use your new managed KB ID
+
+Managed KBs use `managedSearchConfiguration` instead of `vectorSearchConfiguration`:
+```python
+# Managed retrieval (recommended)
+retrieval_config = {
+    "managedSearchConfiguration": {
+        "numberOfResults": 5
+    }
+}
+
+# Vector retrieval (legacy)
+retrieval_config = {
+    "vectorSearchConfiguration": {
+        "numberOfResults": 5
+    }
+}
+```
+
+> **Tip:** Managed KBs support agentic retrieval with intelligent query decomposition. Requires `boto3 >= 1.43`.
+
+Managed KBs use a service-managed reranker by default (`rerankingModelType: MANAGED`). You can disable reranking (`NONE`) or use a custom model (`CUSTOM`).
+
+
+**Required IAM Permissions:**
+```json
+{
+  "Effect": "Allow",
+  "Action": [
+    "bedrock:Retrieve",
+    "bedrock:AgenticRetrieveStream"
+  ],
+  "Resource": "arn:aws:bedrock:<region>:<account-id>:knowledge-base/<kb-id>"
+}
+```
+
+**Resources:** [Build a Managed KB](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-build-managed.html) | [Retrieve API](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-test-retrieve.html) | [Agentic Retrieval](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-test-agentic.html)
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
